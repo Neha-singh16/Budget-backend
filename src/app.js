@@ -61,78 +61,35 @@ app.use("/", budgetRouter);
 app.use("/", profileRouter);
 app.use("/", incomeRouter);
 
+
 // Connect DB, then seed, then start server
-connectDB()
-  .then(async () => {
-    console.log("✅ The database is now connected!!");
-
-    await seedDefaultCategories(); // 👈 Seed categories after DB is connected
-
-    app.listen(3000, () => {
-      console.log("🚀 Server running on port 3000.");
-    });
-  })
-  .catch((err) => {
-    console.error("❌ The database is not connected!!", err);
-  });
-
-
-
-// // src/app.js
-// const express = require("express");
-// const { connectDB } = require("./config/database");
-// const cookieParser = require("cookie-parser");
-// const cors = require("cors");
-// require("dotenv").config();
-
-// const app = express();
-
-
-// app.use(cors({ origin: "http://localhost:5173", credentials: true }));
-// app.use(express.json());
-// app.use(cookieParser());
-
-
-// const { Category } = require("./config/model/category");
-// const defaultCategories = [
-//   "Food",
-//   "Transport",
-//   "Bills & Utilities",
-//   "Entertainment",
-//   "Shopping",
-//   "Education",
-//   "Health",
-//   "Travel",
-//   "Groceries",
-//   "Others",
-// ];
-
-// async function seedDefaultCategories() {
-//   for (const name of defaultCategories) {
-//     const exists = await Category.findOne({ name, userId: null });
-//     if (!exists) await Category.create({ name });
-//   }
-// }
-
-
-// app.use("/", require("./config/router/authRouter"));
-// app.use("/", require("./config/router/expenseRouter"));
-// app.use("/", require("./config/router/categoryRouter"));
-// app.use("/", require("./config/router/budgetRouter"));
-// app.use("/", require("./config/router/profileRouter"));
-// app.use("/", require("./config/router/incomeRouter"));
-
-
 // connectDB()
 //   .then(async () => {
-//     console.log("✅ DB connected");
-//     await seedDefaultCategories();
-//     console.log("✅ Default categories seeded");
+//     console.log("✅ The database is now connected!!");
+
+//     await seedDefaultCategories(); // 👈 Seed categories after DB is connected
+
+//     app.listen(3000, () => {
+//       console.log("🚀 Server running on port 3000.");
+//     });
 //   })
 //   .catch((err) => {
-//     console.error("❌ DB connection error", err);
+//     console.error("❌ The database is not connected!!", err);
 //   });
 
+if (process.env.NODE_ENV !== "production") {
+  connectDB()
+    .then(async () => {
+      console.log("✅ DB connected (local) + seeding…");
+      await seedDefaultCategories();
+      app.listen(3000, () => {
+        console.log("🚀 Server running on port 3000.");
+      });
+    })
+    .catch((err) => {
+      console.error("❌ Local DB connection failed", err);
+    });
+}
 
 
-// module.exports = app;
+ module.exports = app;
