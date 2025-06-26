@@ -1,7 +1,7 @@
 const express = require("express");
 
 const budgetRouter = express.Router();
-const { Budget } = require("../model/Budget");
+const { Budget } = require("../model/budget");
 const { userAuth } = require("../middleware/auth");
 const { Category } = require("../model/category");
 const mongoose = require("mongoose");
