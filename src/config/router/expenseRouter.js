@@ -5,6 +5,7 @@ const expenseRouter = express.Router();
 const { Expense } = require("../model/expenses");
 const { User } = require("../model/users");
 const { validateFeilds } = require("../utils/validate");
+// const router = require("express").Router();
 
 expenseRouter.post("/user/expense", userAuth, async (req, res) => {
   try {
@@ -105,6 +106,5 @@ expenseRouter.patch(
 
 
 
-module.exports = {
-  expenseRouter,
-};
+module.exports = expenseRouter;
+

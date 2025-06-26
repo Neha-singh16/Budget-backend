@@ -138,6 +138,5 @@ categoryRouter.delete(
   }
 );
 
-module.exports = {
-  categoryRouter,
-};
+module.exports =  categoryRouter;
+

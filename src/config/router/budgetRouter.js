@@ -114,6 +114,5 @@ budgetRouter.delete("/user/budget/:id", userAuth, async (req, res) => {
 });
 
 
-module.exports = {
-  budgetRouter,
-};
+module.exports =  budgetRouter
+

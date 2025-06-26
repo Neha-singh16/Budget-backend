@@ -20,9 +20,9 @@ app.use(cookieParser());
 
 // Routers
 const auth = require("./config/router/authRouter");
-const { expenseRouter } = require("./config/router/expenseRouter");
-const { categoryRouter } = require("./config/router/categoryRouter");
-const { budgetRouter } = require("./config/router/budgetRouter");
+const  expenseRouter  = require("./config/router/expenseRouter");
+const  categoryRouter  = require("./config/router/categoryRouter");
+const  budgetRouter  = require("./config/router/budgetRouter");
 
 const profileRouter = require("./config/router/profileRouter");
 const incomeRouter = require("./config/router/incomeRouter");
@@ -62,34 +62,19 @@ app.use("/", profileRouter);
 app.use("/", incomeRouter);
 
 
-// Connect DB, then seed, then start server
-// connectDB()
-//   .then(async () => {
-//     console.log("✅ The database is now connected!!");
-
-//     await seedDefaultCategories(); // 👈 Seed categories after DB is connected
-
-//     app.listen(3000, () => {
-//       console.log("🚀 Server running on port 3000.");
-//     });
-//   })
-//   .catch((err) => {
-//     console.error("❌ The database is not connected!!", err);
-//   });
-
-if (process.env.NODE_ENV !== "production") {
-  connectDB()
-    .then(async () => {
-      console.log("✅ DB connected (local) + seeding…");
+connectDB()
+  .then(async () => {
+    console.log("✅ DB connected");
+    if (process.env.NODE_ENV !== "production") {
+      // only seed + listen when working locally
       await seedDefaultCategories();
-      app.listen(3000, () => {
-        console.log("🚀 Server running on port 3000.");
-      });
-    })
-    .catch((err) => {
-      console.error("❌ Local DB connection failed", err);
-    });
-}
-
+      app.listen(3000, () =>
+        console.log("🚀 Local server listening on http://localhost:3000")
+      );
+    }
+  })
+  .catch((err) => {
+    console.error("❌ DB connection failed", err);
+  });
 
  module.exports = app;
