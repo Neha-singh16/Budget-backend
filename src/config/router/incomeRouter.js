@@ -1,7 +1,7 @@
 
 // src/routes/incomeRouter.js
 const express = require("express");
-const { Income } = require("../model/income");
+const { Income } = require("../model/Income");
 const { userAuth } = require("../middleware/auth");
 
 const incomeRouter = express.Router();
