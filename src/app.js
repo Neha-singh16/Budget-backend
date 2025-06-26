@@ -97,7 +97,18 @@ const { Category } = require("./config/model/category");
 const app = express();
 
 // middleware setup …
-app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+// app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
+const FRONTEND = process.env.FRONTEND_URL; // e.g. "https://budget-frontend-nine.vercel.app"
+const corsOptions = {
+  origin: FRONTEND,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+};
+
+app.use(cors(corsOptions));
+// also catch all pre-flights
+app.options("/", cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
