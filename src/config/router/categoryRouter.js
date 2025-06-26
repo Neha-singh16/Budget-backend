@@ -4,43 +4,78 @@ const { userAuth } = require("../middleware/auth");
 const categoryRouter = express.Router();
 const { Category } = require("../model/category");
 
+// categoryRouter.post("/user/category", userAuth, async (req, res) => {
+//   try {
+//     const userId = req.user._id;
+//     const category = new Category({ ...req.body, userId });
+//     const saved = await category.save();
+
+//     return res.status(201).json(saved);
+//   } catch (err) {
+//     res.status(400).send(` Error: ${err.message}`);
+//   }
+// });
+
+
 categoryRouter.post("/user/category", userAuth, async (req, res) => {
+
+  const { name } = req.body;
+  const userId = req.user._id;
+
+  const exists = await Category.findOne({ name, userId });
+  if (exists) return res.status(400).json({ error: "Category already exists" });
+
+  const category = await Category.create({ name, userId });
+  res.status(201).json(category);
+});
+
+
+categoryRouter.get("/category",userAuth , async (req, res) => {
+  try {
+       const userId = req.user._id;
+
+    const categories = await Category.find({
+      $or: [
+        { userId: userId },  // user-created
+        { userId: null },    // default/global
+      ]
+    }).sort({ name: 1 }); // optional: sort alphabetically
+
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch categories" });
+  }
+  
+});
+// categoryRouter.get("/user/category/:categoryId", userAuth, async (req, res) => {
+//   try {
+//     const { categoryId } = req.params;
+//     const userId = req.user._id;
+
+//     const category = await Category.findOne({ _id: categoryId, userId: userId })
+//       .populate("parentCategoryId") // pulls in the parent doc
+//       .populate("children") // pulls in all direct sub-categories
+//       .lean();
+//     res.json(category);
+//   } catch (err) {
+//     res.status(400).send(` Error: ${err.message}`);
+//   }
+// });
+
+// GET /user/category
+categoryRouter.get("/user/category",userAuth, async (req, res) => {
   try {
     const userId = req.user._id;
-    const category = new Category({ ...req.body, userId });
-    const saved = await category.save();
+    const categories = await Category.find({
+      $or: [{ userId: null }, { userId }],
+    });
 
-    return res.status(201).json(saved);
-  } catch (err) {
-    res.status(400).send(` Error: ${err.message}`);
+    res.json(categories);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch categories" });
   }
 });
 
-categoryRouter.get("/user/category", userAuth, async (req, res) => {
-  try {
-    const loggedInUser = req.user._id;
-
-    const allCategory = await Category.find({ userId: loggedInUser });
-    res.json(allCategory);
-  } catch (err) {
-    res.status(400).send(` Error: ${err.message}`);
-  }
-});
-
-categoryRouter.get("/user/category/:categoryId", userAuth, async (req, res) => {
-  try {
-    const { categoryId } = req.params;
-    const userId = req.user._id;
-
-    const category = await Category.findOne({ _id: categoryId, userId: userId })
-      .populate("parentCategoryId") // pulls in the parent doc
-      .populate("children") // pulls in all direct sub-categories
-      .lean();
-    res.json(category);
-  } catch (err) {
-    res.status(400).send(` Error: ${err.message}`);
-  }
-});
 
 categoryRouter.patch(
   "/user/category/:categoryId",

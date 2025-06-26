@@ -4,25 +4,27 @@ const categorySchema = mongoose.Schema(
   {
     userId: {
       type: mongoose.Schema.Types.ObjectId,
-      required: true,
-      ref: "user",
+      // required: true,
+      ref: "User",
+      default: null,
       index: true,
     },
-    expenseId : { 
-      type : mongoose.Schema.Types.ObjectId,
-      ref : "Expense",
+    expenseId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Expense",
       // required : true,
-    } ,
-    budgetId :{
-      type : mongoose.Schema.Types.ObjectId,
-      ref : "Budget",
+    },
+    budgetId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Budget",
       // required : true,
     },
     name: {
       type: String,
       required: true,
       trim: true,
-    }, spent: {
+    },
+     spent: {
       type: Number,
       min: [0, "Spent Should be Non-negative"],
       default: 0,
@@ -48,10 +50,10 @@ const categorySchema = mongoose.Schema(
 );
 
 categorySchema.virtual('children', {
-  ref: 'Category',               
-  localField: '_id',             
-  foreignField: 'parentCategoryId', 
-  justOne: false                 
+  ref: 'Category',
+  localField: '_id',
+  foreignField: 'parentCategoryId',
+  justOne: false
 });
 
 const Category = mongoose.model("Category", categorySchema);

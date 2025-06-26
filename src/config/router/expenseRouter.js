@@ -14,7 +14,9 @@ expenseRouter.post("/user/expense", userAuth, async (req, res) => {
 
     return res.status(201).json(saved);
   } catch (err) {
-    res.status(400).send(` Error: ${err.message}`);
+    // res.status(400).send(` Error: ${err.message}`);
+    res.status(400).json({ error: err.message });
+
   }
 });
 

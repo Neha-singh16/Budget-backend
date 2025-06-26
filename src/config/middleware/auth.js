@@ -1,31 +1,33 @@
-const cookies = require("cookie-parser");
+// src/middleware/authenticate.js
 const jwt = require("jsonwebtoken");
 const { User } = require("../model/users");
 
-const userAuth = async (req, res, next) => {
+async function userAuth(req, res, next) {
   try {
-    const {token} = req.cookies;
+    const token = req.cookies?.token;
     if (!token) {
-      res.status(401).send("Please login first...");
-      return;
+      return res.status(401).json({ error: "Authentication required" });
+    }
+          
+    let payload;
+    try {
+      payload = jwt.verify(token, process.env.JWT_SECRET);
+    } catch {
+      return res.status(403).json({ error: "Invalid or expired session" });
     }
 
-const decodeMessage = await jwt.verify(token, 'Nain@$123');
-    const { _id } = decodeMessage;
-
-    const user = await User.findOne({ _id });
+    const user = await User.findById(payload.id);
     if (!user) {
-      throw new Error("Invalid User");
+      return res.status(401).json({ error: "User no longer exists" });
     }
 
     req.user = user;
     next();
+
   } catch (err) {
-    res.status(400).send(` Error: ${err.message}`);
+    console.error("Auth error:", err);
+    res.status(500).json({ error: "Server error during authentication" });
   }
-};
-
-
-module.exports = {
-    userAuth,
 }
+
+module.exports = { userAuth };

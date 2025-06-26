@@ -6,7 +6,7 @@ const budgetSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
- 
+
   categoryId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Category",
@@ -36,7 +36,17 @@ const budgetSchema = mongoose.Schema({
     default: true,
   },
 });
+budgetSchema.pre("remove", async function (next) {
+  const Expense  = mongoose.model("Expense");
+  const Category = mongoose.model("Category");
+  const budgetId = this._id;
 
+  // you need to await these
+  await Expense.deleteMany({ budget: budgetId });
+  await Category.deleteMany({ budget: budgetId });
+
+  next();
+});
 
 
 const Budget = mongoose.model("Budget", budgetSchema);

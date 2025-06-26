@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const { Budget } = require("./Budget");
 
 const expenseSchema = new mongoose.Schema(
   {
@@ -7,6 +8,11 @@ const expenseSchema = new mongoose.Schema(
       ref: "User",
       required: true,
       index: true,
+    },
+    budget : {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Budget",
+      required: true, 
     },
     amount: {
       type: Number,
@@ -41,6 +47,7 @@ const expenseSchema = new mongoose.Schema(
 expenseSchema.pre("save", async function (next) {
   if (!this.isNew) {
     const existing = await this.constructor.findById(this._id).lean();
+
     this._originalAmount = existing ? existing.amount : 0;
   }
   next();
@@ -54,7 +61,7 @@ async function updateSpent(catId, amountDiff) {
   while (cat) {
     await Category.findByIdAndUpdate(
       cat._id,
-      { $inc: { spent: amountDiff } },
+      { $inc: { spent: amountDiff } }, 
       { new: true }
     );
 
@@ -76,11 +83,16 @@ expenseSchema.post("save", async function () {
     await updateSpent(this.category, this.amount);
   } else {
     const oldAmt = this._originalAmount || 0;
-    const diff = this.amount - oldAmt; // 350 - 250 = +100
+    const diff = this.amount - oldAmt;
     if (diff !== 0) {
       await updateSpent(this.category, diff);
     }
   }
+});
+
+expenseSchema.pre("remove", async function (next) {
+  await updateSpent(this.category, -this.amount);
+  next();
 });
 
 const Expense = mongoose.model("Expense", expenseSchema);

@@ -14,28 +14,45 @@ const validateSignUp = async (req) => {
   }
 };
 
-const validateFeilds = async (req) => {
-  // const {amount , date , category , subCategories , note} = req.body;
-  const ALLOWED_FIELDS = [
-    "amount",
-    "date",
-    "category",
-    "subCategories",
-    "note",
-  ];
+// const validateFeilds = async (req) => {
+//   // const {amount , date , category , subCategories , note} = req.body;
+//   const ALLOWED_FIELDS = [
+//     "amount",
+//     "date",
+//     "category",
+//     "subCategories",
+//     "note",
+//   ];
 
+//   const data = req.body;
+
+//   if (Object.keys(data).length === 0) {
+//     throw new Error("No fields provided for update!!");
+//   }
+
+//   const isUpdateFeilds =  Object.keys(data).every(field => 
+//     ALLOWED_FIELDS.includes(field)
+//   );
+//   if (!isUpdateFeilds) {
+//     throw new Error("Invalid feild Update");
+//   }
+// };
+
+const validateFeilds = (req) => {
+  const ALLOWED_FIELDS = ["firstName", "lastName" ,  'email' , "dob", "age", "gender" , "phoneNo" , "address"];
   const data = req.body;
 
   if (Object.keys(data).length === 0) {
     throw new Error("No fields provided for update!!");
   }
-
-  const isUpdateFeilds =  Object.keys(data).every(field => 
-    ALLOWED_FIELDS.includes(field)
+  const isUpdateUser = Object.keys(data).every((fields) =>
+    ALLOWED_FIELDS.includes(fields)
   );
-  if (!isUpdateFeilds) {
-    throw new Error("Invalid feild Update");
+
+  if (!isUpdateUser) {
+    throw new Error("Invalide Update!!");
   }
+  // return isUpdateUser;
 };
 
 module.exports = {
