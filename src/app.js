@@ -109,16 +109,27 @@ const app = express();
 connectDB();
 
 // CORS middleware
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL,
-    credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  })
-);
+// app.use(
+//   cors({
+//     origin: process.env.FRONTEND_URL,
+//     credentials: true,
+//     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//   })
+// );
 
-// Pre-flight support for all routes
-app.options("/", cors());
+// // Pre-flight support for all routes
+// app.options("/", cors());
+
+const corsOptions = {
+  origin: process.env.FRONTEND_URL,  // e.g. https://budget-frontend-nine.vercel.app
+  credentials: true,
+  methods: ["GET","POST","PUT","DELETE","OPTIONS"]
+};
+
+app.use(cors(corsOptions));
+
+// Pre‑flight on *every* path with the same options:
+app.use(cors(corsOptions));
 
 // Body parsing + cookie parsing
 app.use(express.json());
@@ -153,6 +164,8 @@ app.use("/", categoryRouter);
 app.use("/", budgetRouter);
 app.use("/", profileRouter);
 app.use("/", incomeRouter);
+
+
 
 // Seed and listen locally
 if (process.env.NODE_ENV !== "production") {
