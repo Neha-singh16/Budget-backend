@@ -8,6 +8,11 @@ require("dotenv").config();
 
 const app = express();
 
+app.get('/', (req, res) => {
+  res.send('🟢 Backend is live!');
+});
+
+
 app.use(
   cors({
     origin: "http://localhost:5173",
