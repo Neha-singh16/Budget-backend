@@ -113,12 +113,12 @@ app.use(
   cors({
     origin: process.env.FRONTEND_URL,
     credentials: true,
-    // methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   })
 );
 
 // Pre-flight support for all routes
-// app.options("/", cors());
+app.options("/", cors());
 
 // Body parsing + cookie parsing
 app.use(express.json());
