@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const { Budget } = require("./Budget");
+// const { Budget } = require("./Budget");
 
 const expenseSchema = new mongoose.Schema(
   {

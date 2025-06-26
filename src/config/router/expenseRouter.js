@@ -3,7 +3,7 @@ const express = require("express");
 const { userAuth } = require("../middleware/auth");
 const expenseRouter = express.Router();
 const { Expense } = require("../model/expenses");
-const { User } = require("../model/users");
+// const { User } = require("../model/users");
 const { validateFeilds } = require("../utils/validate");
 // const router = require("express").Router();
 
