@@ -12,7 +12,6 @@
 //   res.send('🟢 Backend is live!');
 // });
 
-
 // app.use(
 //   cors({
 //     origin: process.env.FRONTEND_URL,
@@ -66,7 +65,6 @@
 // app.use("/", profileRouter);
 // app.use("/", incomeRouter);
 
-
 // connectDB()
 //   .then(async () => {
 //     console.log("✅ DB connected");
@@ -85,8 +83,8 @@
 //  module.exports = app;
 
 
+// app.js (or server.js)
 
-/* app.js */
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
@@ -94,89 +92,65 @@ require("dotenv").config();
 
 const { connectDB } = require("./config/database");
 const { Category } = require("./config/model/category");
-
-// Routers
-const authRouter      = require("./config/router/authRouter");
-const expenseRouter   = require("./config/router/expenseRouter");
-const categoryRouter  = require("./config/router/categoryRouter");
-const budgetRouter    = require("./config/router/budgetRouter");
-const profileRouter   = require("./config/router/profileRouter");
-const incomeRouter    = require("./config/router/incomeRouter");
+// … your routers …
 
 const app = express();
 
-// Always connect to the database
-connectDB();
-
-// CORS middleware
-// app.use(
-//   cors({
-//     origin: process.env.FRONTEND_URL,
-//     credentials: true,
-//     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-//   })
-// );
-
-// // Pre-flight support for all routes
-// app.options("/", cors());
-
-const corsOptions = {
-  origin: process.env.FRONTEND_URL,  // e.g. https://budget-frontend-nine.vercel.app
-  credentials: true,
-  methods: ["GET","POST","PUT","DELETE","OPTIONS"]
-};
-
-app.use(cors(corsOptions));
-
-// Pre‑flight on *every* path with the same options:
-app.use(cors(corsOptions));
-
-// Body parsing + cookie parsing
+// middleware setup …
+app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
 app.use(express.json());
 app.use(cookieParser());
 
-// Root health-check
-app.get("/", (req, res) => {
-  res.send("🟢 Backend is live!");
-});
+// health check
+app.get("/", (req, res) => res.send("🟢 Backend is live!"));
 
-// Default categories to seed in development only
+// seed function (dev only)
 const defaultCategories = [
-  "Food", "Transport", "Bills & Utilities", "Entertainment",
-  "Shopping", "Education", "Health", "Travel", "Groceries", "Others",
+  "Food",
+  "Transport",
+  "Bills & Utilities",
+  "Entertainment",
+  "Shopping",
+  "Education",
+  "Health",
+  "Travel",
+  "Groceries",
+  "Others",
 ];
-
 async function seedDefaultCategories() {
   for (const name of defaultCategories) {
     const exists = await Category.findOne({ name, userId: null });
-    if (!exists) {
-      await Category.create({ name });
-      console.log(`Created default category: ${name}`);
-    }
+    if (!exists) await Category.create({ name });
   }
   console.log("✅ Default categories seeded.");
 }
 
-// Mount routers
-app.use("/", authRouter);
-app.use("/", expenseRouter);
-app.use("/", categoryRouter);
-app.use("/", budgetRouter);
-app.use("/", profileRouter);
-app.use("/", incomeRouter);
+// bootstrapping
+async function startServer() {
+  // 1) Connect to Mongo
+  await connectDB();
+  console.log("✅ MongoDB connected successfully");
 
+  // 2) If we’re _not_ in production, seed defaults
+  if (process.env.NODE_ENV !== "production") {
+    await seedDefaultCategories().catch((e) => console.error("Seed error:", e));
+  }
 
-
-// Seed and listen locally
-if (process.env.NODE_ENV !== "production") {
-  seedDefaultCategories()
-    .catch(err => console.error("Seed error:", err))
-    .then(() => {
-      const port = process.env.PORT || 3000;
-      app.listen(port, () =>
-        console.log(`🚀 Local server listening at http://localhost:${port}`)
-      );
-    });
+  // 3) Always start listening
+  const port = process.env.PORT || 3000;
+  app.listen(port, () => {
+    console.log(
+      `🟢 EXPRESS SERVER STARTED in ${
+        process.env.NODE_ENV || "undefined"
+      } on port ${port}`
+    );
+  });
 }
 
-module.exports = app;
+// kick it off
+startServer().catch((err) => {
+  console.error("❌ Failed to start server:", err);
+  process.exit(1);
+});
+
+module.exports = app; // if you ever need to import for tests or serverless wrappers
