@@ -82,7 +82,6 @@
 
 //  module.exports = app;
 
-
 // app.js (or server.js)
 
 const express = require("express");
@@ -94,6 +93,13 @@ const { connectDB } = require("./config/database");
 const { Category } = require("./config/model/category");
 // … your routers …
 
+const auth = require("./config/router/authRouter");
+const expenseRouter = require("./config/router/expenseRouter");
+const categoryRouter = require("./config/router/categoryRouter");
+const budgetRouter = require("./config/router/budgetRouter");
+
+const profileRouter = require("./config/router/profileRouter");
+const incomeRouter = require("./config/router/incomeRouter");
 const app = express();
 
 // middleware setup …
@@ -107,7 +113,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-// also catch all pre-flights
 app.options("/", cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
@@ -135,6 +140,13 @@ async function seedDefaultCategories() {
   }
   console.log("✅ Default categories seeded.");
 }
+
+app.use("/", auth);
+app.use("/", expenseRouter);
+app.use("/", categoryRouter);
+app.use("/", budgetRouter);
+app.use("/", profileRouter);
+app.use("/", incomeRouter);
 
 // bootstrapping
 async function startServer() {
