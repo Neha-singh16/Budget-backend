@@ -6,15 +6,12 @@
 // const { Category } = require("./config/model/category");
 // require("dotenv").config();
 
+// // const path = require("path");
 // const app = express();
-
-// app.get('/', (req, res) => {
-//   res.send('🟢 Backend is live!');
-// });
 
 // app.use(
 //   cors({
-//     origin: process.env.FRONTEND_URL,
+//     origin: "http://localhost:5173",
 //     credentials: true,
 //   })
 // );
@@ -23,26 +20,25 @@
 // app.use(cookieParser());
 
 // // Routers
-// const auth = require("./config/router/authRouter");
-// const  expenseRouter  = require("./config/router/expenseRouter");
-// const  categoryRouter  = require("./config/router/categoryRouter");
-// const  budgetRouter  = require("./config/router/budgetRouter");
-
-// const profileRouter = require("./config/router/profileRouter");
-// const incomeRouter = require("./config/router/incomeRouter");
+// const auth           = require("./config/router/authRouter");
+// const expenseRouter  = require("./config/router/expenseRouter");
+// const categoryRouter = require("./config/router/categoryRouter");
+// const budgetRouter   = require("./config/router/budgetRouter");
+// const profileRouter  = require("./config/router/profileRouter");
+// const incomeRouter   = require("./config/router/incomeRouter");
 
 // // Default categories
 // const defaultCategories = [
-// "Food",
-// "Transport",
-// "Bills & Utilities",
-// "Entertainment",
-// "Shopping",
-// "Education",
-// "Health",
-// "Travel",
-// "Groceries",
-// "Others",
+//   "Food",
+//   "Transport",
+//   "Bills & Utilities",
+//   "Entertainment",
+//   "Shopping",
+//   "Education",
+//   "Health",
+//   "Travel",
+//   "Groceries",
+//   "Others",
 // ];
 
 // // Seed function (without connecting/disconnecting again)
@@ -57,6 +53,22 @@
 //   console.log("✅ Default categories seeded.");
 // }
 
+// // Connect DB, then seed, then start server
+// connectDB()
+//   .then(async () => {
+//     console.log("✅ The database is now connected!!");
+
+//     await seedDefaultCategories(); // 👈 Seed categories after DB is connected
+
+//     app.listen(3000, () => {
+//       console.log("🚀 Server running on port 3000.");
+//     });
+//   })
+//   .catch((err) => {
+//     console.error("❌ The database is not connected!!", err);
+//   });
+// // const _dirname = path.resolve();
+
 // // Routes
 // app.use("/", auth);
 // app.use("/", expenseRouter);
@@ -65,30 +77,19 @@
 // app.use("/", profileRouter);
 // app.use("/", incomeRouter);
 
-// connectDB()
-//   .then(async () => {
-//     console.log("✅ DB connected");
-//     if (process.env.NODE_ENV !== "production") {
-//       // only seed + listen when working locally
-//       await seedDefaultCategories();
-//       app.listen(3000, () =>
-//         console.log("🚀 Local server listening on http://localhost:3000")
-//       );
-//     }
-//   })
-//   .catch((err) => {
-//     console.error("❌ DB connection failed", err);
-//   });
+//  module.exports = app; 
+// // app.use(express.static(path.join(_dirname, "../BudgetApp/dist")));
+// // app.get("/", (req, res) => {
+// //   res.sendFile(path.resolve(_dirname, "../BudgetApp/dist" , "index.html" ));
+// // })
 
-//  module.exports = app;
 
-// app.js (or server.js)
 
 const express = require("express");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 require("dotenv").config();
-
+const mongoose = require("mongoose");
 const { connectDB } = require("./config/database");
 const { Category } = require("./config/model/category");
 // … your routers …
@@ -102,18 +103,28 @@ const profileRouter = require("./config/router/profileRouter");
 const incomeRouter = require("./config/router/incomeRouter");
 const app = express();
 
-// middleware setup …
+// // middleware setup …
 // app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
-const FRONTEND = process.env.FRONTEND_URL; // e.g. "https://budget-frontend-nine.vercel.app"
-const corsOptions = {
-  origin: FRONTEND,
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-};
+// const FRONTEND = process.env.FRONTEND_URL; // e.g. "https://budget-frontend-nine.vercel.app"
+// // const corsOptions = {
+// //   origin: FRONTEND,
+// //   credentials: true,
+// //   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+// //   allowedHeaders: ["Content-Type", "Authorization"],
+// // };
 
-app.use(cors(corsOptions));
-app.options("/", cors(corsOptions));
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+  })
+);
+
+app.use(express.json());
+app.use(cookieParser());
+
+// // app.use(cors(corsOptions));
+// // app.options("/", cors(corsOptions));
 app.use(express.json());
 app.use(cookieParser());
 
