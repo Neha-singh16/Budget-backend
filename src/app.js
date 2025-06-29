@@ -110,16 +110,28 @@ const app = express();
 //     credentials: true,
 //   })
 // );
-
+const FRONTEND_URL = process.env.FRONTEND_URL; 
 const allowed = [
   "http://localhost:5173",
-  "https://your-frontend-vercel-domain.vercel.app"
+  FRONTEND_URL
 ];
-app.use(cors({
-  origin: (origin, cb) => cb(null, allowed.includes(origin)),
-  credentials: true
-}));
 
+const corsOptions = {
+  origin(origin, cb) {
+    // allow no‑origin (Postman/cURL) or one of your whitelisted origins
+    if (!origin || allowed.includes(origin)) {
+      return cb(null, true);
+    }
+    cb(new Error(`CORS policy: ${origin} not allowed`));
+  },
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+// you can even omit this next line,
+// because `app.use(cors())` already handles OPTIONS by default,
+// but leaving it is fine:
+app.options("" ,cors(corsOptions));
 
 app.use(express.json());
 app.use(cookieParser());
