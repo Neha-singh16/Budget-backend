@@ -119,6 +119,10 @@ const { userAuth } = require("../middleware/auth");
 
 const authRouter = express.Router();
 
+
+authRouter.get('/login', (req, res) => {
+  res.send("🚀 login route is up, but please POST your creds here");
+});
 // ─── SIGN UP ───────────────────────────────────────────
 authRouter.post("/signup", async (req, res) => {
   try {

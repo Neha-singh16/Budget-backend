@@ -103,22 +103,23 @@ const profileRouter = require("./config/router/profileRouter");
 const incomeRouter = require("./config/router/incomeRouter");
 const app = express();
 
-// // middleware setup …
-// app.use(cors({ origin: process.env.FRONTEND_URL, credentials: true }));
-// const FRONTEND = process.env.FRONTEND_URL; // e.g. "https://budget-frontend-nine.vercel.app"
-// // const corsOptions = {
-// //   origin: FRONTEND,
-// //   credentials: true,
-// //   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-// //   allowedHeaders: ["Content-Type", "Authorization"],
-// // };
 
-app.use(
-  cors({
-    origin: "http://localhost:5173",
-    credentials: true,
-  })
-);
+// app.use(
+//   cors({
+//     origin: "http://localhost:5173",
+//     credentials: true,
+//   })
+// );
+
+const allowed = [
+  "http://localhost:5173",
+  "https://your-frontend-vercel-domain.vercel.app"
+];
+app.use(cors({
+  origin: (origin, cb) => cb(null, allowed.includes(origin)),
+  credentials: true
+}));
+
 
 app.use(express.json());
 app.use(cookieParser());
