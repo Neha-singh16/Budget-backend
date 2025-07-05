@@ -113,13 +113,21 @@ const app = express();
 const FRONTEND_URL = process.env.FRONTEND_URL; 
 const allowed = [
   "http://localhost:5173",
-  FRONTEND_URL
+  process.env.FRONTEND_URL,          // production
+  process.env.FRONTEND_URL_PREVIEW   // your git-main preview
 ];
 
 const corsOptions = {
   origin(origin, cb) {
-    // allow no‑origin (Postman/cURL) or one of your whitelisted origins
-    if (!origin || allowed.includes(origin)) {
+    if(!origin) {
+      // allow Postman/cURL etc
+      return cb(null, true);
+    }
+    // allow localhost OR any .vercel.app domain
+    if (
+      origin === "http://localhost:5173" ||
+      origin.endsWith(".vercel.app")
+    ) {
       return cb(null, true);
     }
     cb(new Error(`CORS policy: ${origin} not allowed`));
@@ -127,24 +135,22 @@ const corsOptions = {
   credentials: true
 };
 
+
 app.use(cors(corsOptions));
-// you can even omit this next line,
-// because `app.use(cors())` already handles OPTIONS by default,
-// but leaving it is fine:
-app.options("" ,cors(corsOptions));
+
+
 
 app.use(express.json());
 app.use(cookieParser());
 
-// // app.use(cors(corsOptions));
-// // app.options("/", cors(corsOptions));
+
 app.use(express.json());
 app.use(cookieParser());
 
 // health check
 app.get("/", (req, res) => res.send("🟢 Backend is live!"));
 
-// seed function (dev only)
+
 const defaultCategories = [
   "Food",
   "Transport",
